@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zhTW">
+
+<head>
+  <meta charset="UTF-8">
+
+  <style class="cp-pen-styles">/* Remove margins and padding from the list */
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the list items */
+ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    background: #eee;
+    font-size: 18px;
+    transition: 0.2s;
+
+    /* make the list items unselectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Darker background-color on hover */
+ul li:hover {
+    background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+ul li.checked {
+    background: #888;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+/* Add a "checked" mark when clicked on */
+ul li.checked::before {
+    content: '';
+    position: absolute;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    top: 10px;
+    left: 16px;
+    transform: rotate(45deg);
+    height: 15px;
+    width: 7px;
+}
+
+.todo-timestamp{
+  position: absolute;
+  right: 35px;
+  bottom: 10px;
+  font-size: 0.8rem;
+}
+
+/* Style the close button */
+.close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 12px 16px 12px 16px;
+}
+
+.close:hover {
+    background-color: #f44336;
+    color: white;
+}</style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2>待辦清單</h2>
+    <input type="text" id="todo-input" placeholder="待辦事項">
+    <button id="addTodo">新增</button>
+  </div>
+
+  <ul id="todo-list">
+  </ul>
+  <script type="text/javascript" src="main.js"></script></body>
+
+</html>

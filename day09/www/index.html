@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zhTW">
+
+<head>
+  <meta charset="UTF-8">
+
+  <style class="cp-pen-styles">/* Remove margins and padding from the list */
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the list items */
+ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    background: #eee;
+    font-size: 18px;
+    transition: 0.2s;
+
+    /* make the list items unselectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Darker background-color on hover */
+ul li:hover {
+    background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+ul li.checked {
+    background: #888;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+/* Add a "checked" mark when clicked on */
+ul li.checked::before {
+    content: '';
+    position: absolute;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    top: 10px;
+    left: 16px;
+    transform: rotate(45deg);
+    height: 15px;
+    width: 7px;
+}
+
+.todo-timestamp{
+  position: absolute;
+  right: 35px;
+  bottom: 10px;
+  font-size: 0.8rem;
+}
+
+/* Style the close button */
+.close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 12px 16px 12px 16px;
+}
+
+.close:hover {
+    background-color: #f44336;
+    color: white;
+}</style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2>待辦清單</h2>
+    <input type="text" id="todo-input" placeholder="待辦事項">
+    <button id="addTodo">新增</button>
+  </div>
+
+  <ul id="todo-list">
+  </ul>
+
+  <script>
+    (function () {
+      var data = [],
+        view = '<li class="{{check}}" data-i="{{i}}"><span class="todo-content">{{content}}</span><span class="close">x</span></li>';
+
+      function TodoItem(content, check) {
+        this.content = content;
+        this.check = Boolean(check);
+        this.time = new Date();
+      };
+
+      TodoItem.prototype.getTime = function () {
+        return this.time.toDateString();
+      };
+
+      TodoItem.prototype.toggle = function () {
+        return this.check = !this.check;
+      };
+
+      function TodoController({ view, data, bindId }) {
+        this.data = data;
+        this.view = view;
+        this.element = document.querySelector(bindId);
+      }
+
+      TodoController.prototype.addTodo = function (content, checked) {
+        this.data.push(new TodoItem(content, checked))
+        this.render();
+      }
+
+      TodoController.prototype.deleteItem = function (index) {
+        this.data.splice(index, 1);
+        this.render();
+      }
+
+      TodoController.prototype.checkItem = function (index) {
+        this.data[index].toggle();
+
+        this.render();
+      }
+
+      TodoController.prototype.render = function () {
+        var renderViewText = this.view,
+          i,
+          length = this.data.length,
+          item,
+          checkValue
+        resultView = '';
+
+        this.empty();
+
+        // set values, skip sanitize text for now...
+        for (i = 0; i < length; i += 1) {
+          item = this.data[i];
+          renderViewText = this.view;
+          checkValue = item.check ? 'checked' : '';
+          renderViewText = renderViewText.replace('{{check}}', checkValue);
+          renderViewText = renderViewText.replace('{{content}}', item.content);
+          renderViewText = renderViewText.replace('{{i}}', i);
+          resultView += renderViewText;
+        }
+        this.element.innerHTML = resultView;
+      }
+
+      TodoController.prototype.empty = function () {
+        while (this.element.firstChild) {
+          this.element.removeChild(this.element.firstChild);
+        }
+      }
+
+      TodoController.prototype.registerEvent = function (eventType, callback) {
+        if (typeof callback === 'function') {
+          this.element.addEventListener(eventType, callback, false);
+        }
+      }
+
+      // INIT Setup
+      var controller = new TodoController({
+        view,
+        data,
+        bindId: '#todo-list',
+      });
+
+      controller.addTodo('第一個工作');
+      controller.addTodo('先完成這個', true);
+
+      controller.registerEvent('click', function (e) {
+        var temp = e.target,
+          i = null;
+
+        while (temp !== e.currentTarget && !i) {
+          i = temp.getAttribute('data-i');
+          temp = temp.parentElement;
+        }
+
+        if (e.target.tagName === 'LI') {
+          controller.checkItem(parseInt(i));
+        }
+
+        if (e.target.className === 'close') {
+          controller.deleteItem(parseInt(i));
+        }
+      })
+
+      todoButton = document.querySelector('#addTodo');
+      todoButton.addEventListener('click', function () {
+        var inputValue = document.getElementById('todo-input').value;
+        if (inputValue === '') {
+          alert("請輸入待辦事項");
+        } else {
+          controller.addTodo(inputValue);
+        }
+      }, false);
+    })()
+  </script>
+</body>
+
+</html>

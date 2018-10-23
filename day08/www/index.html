@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zhTW">
+
+<head>
+  <meta charset="UTF-8">
+
+  <style class="cp-pen-styles">/* Remove margins and padding from the list */
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the list items */
+ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 12px 8px 12px 40px;
+    background: #eee;
+    font-size: 18px;
+    transition: 0.2s;
+
+    /* make the list items unselectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Darker background-color on hover */
+ul li:hover {
+    background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+ul li.checked {
+    background: #888;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+/* Add a "checked" mark when clicked on */
+ul li.checked::before {
+    content: '';
+    position: absolute;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    top: 10px;
+    left: 16px;
+    transform: rotate(45deg);
+    height: 15px;
+    width: 7px;
+}
+
+.todo-timestamp{
+  position: absolute;
+  right: 35px;
+  bottom: 10px;
+  font-size: 0.8rem;
+}
+
+/* Style the close button */
+.close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 12px 16px 12px 16px;
+}
+
+.close:hover {
+    background-color: #f44336;
+    color: white;
+}</style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2>待辦清單</h2>
+    <input type="text" id="todo-input" placeholder="待辦事項">
+    <button id="addTodo">新增</button>
+    <button id="downloadTodo">下載</button>
+  </div>
+
+  <ul id="todo-list">
+    <li><span class="todo-content">第一個工作</span><span class="close">x</span></li>
+    <li class="checked"><span class="todo-content">先完成這個</span><span class="close">x</span></li>
+  </ul>
+
+  <script>
+    (function () {
+      var i,
+        todoButton,
+        myNodelist,
+        span,
+        close,
+        list,
+        downloadButton,
+        myInput;
+
+      todoButton = document.querySelector('#addTodo');
+      todoButton.addEventListener('click', addTodo, false);
+
+      downloadButton = document.querySelector('#downloadTodo');
+      downloadButton.addEventListener('click', downloadCSV, false);
+
+      myNodelist = document.getElementsByTagName("li");
+
+      for (i = 0; i < myNodelist.length; i++) {
+        span = document.createElement("SPAN");
+        span.className = "close";
+
+        timeSpan = document.createElement("SPAN");
+        timeSpan.className = "todo-timestamp";
+        timeSpan.append(document.createTextNode((new Date()).toDateString()));
+
+        span.innerHTML = 'x';
+        myNodelist[i].append(timeSpan);
+        myNodelist[i].appendChild(span);
+      }
+
+      // Click on a close button to hide the current list item
+      close = document.getElementsByClassName("close");
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function () {
+          var div;
+          div = this.parentElement;
+          div.style.display = "none";
+        }
+      }
+
+      // Add a "checked" symbol when clicking on a list item
+      list = document.querySelector('ul');
+      list.addEventListener('click', function (ev) {
+        if (ev.target.tagName === 'LI') {
+          ev.target.classList.toggle('checked');
+        }
+      }, false);
+
+      myInput = document.getElementById("todo-input");
+
+      // Create a new list item when clicking on the "Add" button
+      function addTodo() {
+        var li,
+          inputValue,
+          t,
+          span,
+          txt,
+          contentSpan,
+          timeSpan,
+          div;
+
+        li = document.createElement("li");
+        inputValue = document.getElementById("todo-input").value;
+
+        // 加上 todo-content class
+        t = document.createTextNode(inputValue);
+        contentSpan = document.createElement("span")
+        contentSpan.className = 'todo-content';
+        contentSpan.appendChild(t)
+        li.appendChild(contentSpan);
+
+        if (inputValue === '') {
+          alert("請輸入待辦事項");
+        } else {
+          document.getElementById("todo-list").appendChild(li);
+        }
+        myInput.value = "";
+
+        timeSpan = document.createElement("SPAN");
+        timeSpan.className = "todo-timestamp";
+        timeSpan.append(document.createTextNode((new Date()).toDateString()));
+
+        span = document.createElement("SPAN");
+        txt = document.createTextNode("x");
+        span.className = "close";
+        span.appendChild(txt);
+        li.appendChild(timeSpan);
+        li.appendChild(span);
+
+        for (i = 0; i < close.length; i++) {
+          close[i].onclick = function () {
+            div = this.parentElement;
+            div.style.display = "none";
+          }
+        }
+      }
+
+      function downloadCSV() {
+        
+        var list,
+            i,
+            csvString = '';
+
+        var SEPARATOR = ',',
+            NEW_LINE = '\n';
+
+        list = document.querySelectorAll('li');
+        list.forEach(function(item) {
+          var time = '',
+              content = '',
+              check = 'no';
+
+          check = item.className.indexOf('checked') >= 0 ? 'yes' : check;
+          time = item.querySelector('.todo-timestamp').textContent;
+          content = item.querySelector('.todo-content').textContent;
+          csvString += `${check}${SEPARATOR}${content}${SEPARATOR}${time}${NEW_LINE}`;
+        });
+        console.log(csvString);
+      }
+    })()
+  </script>
+</body>
+
+</html>
